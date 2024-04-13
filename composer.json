@@ -10,15 +10,15 @@
   "autoload": {
     "psr-4": {
       "Ella123\\HyperfCaptcha\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "HyperfTest\\": "tests"
     },
     "files": [
       "src/Functions.php"
     ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HyperfTest\\": "tests"
+    }
   },
   "require": {
     "php": ">=8.1",
