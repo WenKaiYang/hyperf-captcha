@@ -9,8 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-// | Captcha配置文件
-// +----------------------------------------------------------------------
+use function Hyperf\Support\env;
 
 return [
     // 是否启用验证
