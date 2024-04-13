@@ -25,9 +25,9 @@ return (new PhpCsFixer\Config())
         'array_syntax' => [
             'syntax' => 'short'
         ],
-        'list_syntax' => [
-            'syntax' => 'short'
-        ],
+//        'list_syntax' => [
+//            'syntax' => 'short'
+//        ],
         'concat_space' => [
             'spacing' => 'one'
         ],
