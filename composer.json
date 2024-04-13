@@ -1,56 +1,59 @@
 {
-    "name": "ella123/hyperf-captcha",
-    "type": "library",
-    "license": "MIT",
-    "keywords": [
-        "php",
-        "hyperf"
-    ],
-    "description": "hyperf captcha",
-    "autoload": {
-        "psr-4": {
-            "Ella123\\HyperfCaptcha\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "HyperfTest\\": "tests"
-        }
-    },
-    "require": {
-        "php": ">=8.1",
-        "hyperf/cache": "^3.1"
-    },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.0",
-        "mockery/mockery": "^1.0",
-        "phpstan/phpstan": "^1.0",
-        "phpunit/phpunit": "^10.0",
-        "swoole/ide-helper": "dev-master"
-    },
-    "suggest": {
-        "swow/swow": "Required to create swow components.",
-        "ext-openssl": "Required to use HTTPS.",
-        "ext-json": "Required to use JSON.",
-        "ext-pdo": "Required to use MySQL Client.",
-        "ext-pdo_mysql": "Required to use MySQL Client.",
-        "ext-redis": "Required to use Redis Client.",
-        "ext-gd": "Required to use GD"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "config": {
-        "optimize-autoloader": true,
-        "sort-packages": true
-    },
-    "scripts": {
-        "test": "phpunit -c phpunit.xml --colors=always",
-        "analyse": "phpstan analyse --memory-limit 1024M -l 0 ./src",
-        "cs-fix": "php-cs-fixer fix $1"
-    },
-    "extra": {
-        "hyperf": {
-            "config": "Ella123\\HyperfCaptcha\\ConfigProvider"
-        }
+  "name": "ella123/hyperf-captcha",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "php",
+    "hyperf"
+  ],
+  "description": "hyperf captcha",
+  "autoload": {
+    "psr-4": {
+      "Ella123\\HyperfCaptcha\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "HyperfTest\\": "tests"
+    },
+    "files": [
+      "src/Functions.php"
+    ]
+  },
+  "require": {
+    "php": ">=8.1",
+    "hyperf/cache": "^3.1"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.0",
+    "mockery/mockery": "^1.0",
+    "phpstan/phpstan": "^1.0",
+    "phpunit/phpunit": "^10.0",
+    "swoole/ide-helper": "dev-master"
+  },
+  "suggest": {
+    "swow/swow": "Required to create swow components.",
+    "ext-openssl": "Required to use HTTPS.",
+    "ext-json": "Required to use JSON.",
+    "ext-pdo": "Required to use MySQL Client.",
+    "ext-pdo_mysql": "Required to use MySQL Client.",
+    "ext-redis": "Required to use Redis Client.",
+    "ext-gd": "Required to use GD"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "scripts": {
+    "test": "phpunit -c phpunit.xml --colors=always",
+    "analyse": "phpstan analyse --memory-limit 1024M -l 0 ./src",
+    "cs-fix": "php-cs-fixer fix $1"
+  },
+  "extra": {
+    "hyperf": {
+      "config": "Ella123\\HyperfCaptcha\\ConfigProvider"
+    }
+  }
 }
