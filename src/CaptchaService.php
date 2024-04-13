@@ -170,7 +170,7 @@ class CaptchaService implements CaptchaInterface
         // 验证码字体随机颜色
         $this->color = @imagecolorallocate($this->im, mt_rand(1, 150), mt_rand(1, 150), mt_rand(1, 150));
         // 验证码使用随机字体
-        $ttfPath = __DIR__ . '/../../assets/' . ($this->useZh ? 'zhttfs' : 'ttfs') . '/';
+        $ttfPath = __DIR__ . '/assets/' . ($this->useZh ? 'zhttfs' : 'ttfs') . '/';
 
         if (empty($this->fontttf)) {
             $dir = dir($ttfPath);
