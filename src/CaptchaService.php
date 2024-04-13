@@ -94,7 +94,7 @@ class CaptchaService implements CaptchaInterface
     public function create(string $key): string
     {
         // 生成 验证码
-        list($text, $code) = $this->generateCode();
+        [$text, $code] = $this->generateCode();
         // 加密 验证码
         $hash = password_hash(mb_strtolower($code, 'UTF-8'), PASSWORD_BCRYPT);
         // 保存 验证码
@@ -152,8 +152,8 @@ class CaptchaService implements CaptchaInterface
         }
 
         return [
-            'text' => $text,
-            'code' => $code,
+            $text,
+            $code,
         ];
     }
 
