@@ -21,8 +21,9 @@ use function Hyperf\Support\make;
  */
 function captcha_create(?string $key = null): array
 {
+    empty($key) && $key = Str::random();
     return [
-        'key' => empty($key) && $key = Str::random(),
+        'key' => $key,
         'img' => make(CaptchaInterface::class)->create($key),
     ];
 }
