@@ -96,7 +96,7 @@ class CaptchaService implements CaptchaInterface
         // 生成 验证码
         [$text, $code] = $this->generateCode();
         // 加密 验证码
-        $hash = password_hash($code, PASSWORD_BCRYPT, ['cost' => 10]);
+        $hash = password_hash(mb_strtolower($code, 'UTF-8'), PASSWORD_BCRYPT);
         // 保存 验证码
         $this->cache->set($this->cache_key . $key, $hash, $this->expired);
 
