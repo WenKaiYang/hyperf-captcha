@@ -20,7 +20,8 @@ class ConfigProvider
             'dependencies' => [
                 CaptchaInterface::class => CaptchaService::class,
             ],
-            'commands' => [
+            'listeners' => [
+                ValidatorFactoryResolvedListener::class,
             ],
             'annotations' => [
                 'scan' => [
