@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Ella123\HyperfCaptcha;
 
 use Hyperf\Stringable\Str;
-
 use function Hyperf\Support\make;
 
 /**
@@ -21,7 +20,7 @@ use function Hyperf\Support\make;
  */
 function captcha_create(?string $key = null): array
 {
-    empty($key) && $key = Str::random();
+    empty($key) && $key = md5(Str::random(32).time());
     return [
         'key' => $key,
         'img' => make(CaptchaInterface::class)->create($key),
