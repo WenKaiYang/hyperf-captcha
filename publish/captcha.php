@@ -28,8 +28,6 @@ return [
     'useCurve' => true,
     // 是否添加杂点
     'useNoise' => true,
-    // 验证码字体 不设置则随机
-    'fontttf' => '',
     // 背景颜色
     'bg' => [243, 251, 254],
     // 验证码图片高度
