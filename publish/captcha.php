@@ -19,7 +19,7 @@ return [
     // 验证码字符集合
     'code_set' => '2345678abcdefhijkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY',
     // 验证码过期时间
-    'expire' => 1800,
+    'expired' => 600,
     // 是否使用算术验证码
     'math' => true,
     // 验证码字符大小
