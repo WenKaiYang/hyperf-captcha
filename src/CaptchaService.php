@@ -20,34 +20,37 @@ use Psr\SimpleCache\InvalidArgumentException;
 class CaptchaService implements CaptchaInterface
 {
     // 验证码字符集合
-    protected string $codeSet = '2345678abcdefhjkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY';
+    protected string $code_set = '2345678abcdefhjkmnpqrstuvwxyzABCDEFGHJKLMNPQRTUVWXY';
 
     // 验证码过期时间（s）
     protected int $expired = 600;
 
     // 使用中文验证码
-    protected bool $useZh = false;
+    protected bool $use_zh = false;
 
     // 验证码字体大小(px)
-    protected int $fontSize = 25;
+    protected int $font_size = 25;
 
     // 是否画混淆曲线
-    protected bool $useCurve = true;
+    protected bool $use_curve = true;
 
     // 是否添加杂点
-    protected bool $useNoise = true;
+    protected bool $use_noise = true;
 
     // 验证码图片高度
-    protected int $imageH = 0;
+    protected int $img_height = 0;
 
     // 验证码图片宽度
-    protected int $imageW = 0;
+    protected int $img_width = 0;
 
     // 验证码位数
     protected int $length = 5;
 
+    // 验证码字体，不设置随机获取
+    protected string $font_ttf = '';
+
     // 背景颜色
-    protected array $bg = [243, 251, 254];
+    protected array $background_color = [243, 251, 254];
 
     // 算术验证码
     protected bool $math = true;
@@ -56,7 +59,7 @@ class CaptchaService implements CaptchaInterface
     protected int $quality = 60;
 
     // 验证码图片实例
-    protected false|GdImage $im;
+    protected false|GdImage $img;
 
     // 验证码字体颜色
     protected false|int $color;
@@ -102,7 +105,7 @@ class CaptchaService implements CaptchaInterface
         $text = '';
 
         if ($this->math) {
-            $this->useZh = false;
+            $this->use_zh = false;
             $this->length = 5;
 
             $x = rand(10, 30);
@@ -111,9 +114,9 @@ class CaptchaService implements CaptchaInterface
             $code = $x + $y;
             $code .= '';
         } else {
-            $characters = $this->useZh
+            $characters = $this->use_zh
                 ? preg_split('/(?<!^)(?!$)/u', $this->zhSet)
-                : str_split($this->codeSet);
+                : str_split($this->code_set);
 
             for ($i = 0; $i < $this->length; ++$i) {
                 $text .= $characters[rand(0, count($characters) - 1)];
@@ -131,19 +134,19 @@ class CaptchaService implements CaptchaInterface
     protected function createImage(string $text): string
     {
         // 图片宽(px)
-        $this->imageW || $this->imageW = (int) ($this->length * $this->fontSize * 1.5 + $this->length * $this->fontSize / 2);
+        $this->img_width || $this->img_width = (int) ($this->length * $this->font_size * 1.5 + $this->length * $this->font_size / 2);
         // 图片高(px)
-        $this->imageH || $this->imageH = (int) ($this->fontSize * 2.5);
+        $this->img_height || $this->img_height = (int) ($this->font_size * 2.5);
         // 建立一幅 $this->imageW x $this->imageH 的图像
-        $this->im = @imagecreate((int) $this->imageW, (int) $this->imageH);
+        $this->img = @imagecreate((int) $this->img_width, (int) $this->img_height);
         // 设置背景
-        @imagecolorallocate($this->im, $this->bg[0], $this->bg[1], $this->bg[2]);
+        @imagecolorallocate($this->img, $this->background_color[0], $this->background_color[1], $this->background_color[2]);
         // 验证码字体随机颜色
-        $this->color = @imagecolorallocate($this->im, mt_rand(1, 150), mt_rand(1, 150), mt_rand(1, 150));
+        $this->color = @imagecolorallocate($this->img, mt_rand(1, 150), mt_rand(1, 150), mt_rand(1, 150));
         // 验证码使用随机字体
         $ttfPath = __DIR__.'/assets/ttfs/';
 
-        if (empty($this->fontttf)) {
+        if (empty($this->font_ttf)) {
             $dir = dir($ttfPath);
             $ttfs = [];
             while (false !== ($file = $dir->read())) {
@@ -152,34 +155,34 @@ class CaptchaService implements CaptchaInterface
                 }
             }
             $dir->close();
-            $this->fontttf = $ttfs[array_rand($ttfs)];
+            $this->font_ttf = $ttfs[array_rand($ttfs)];
         }
         // 字体
-        $fontttf = $ttfPath.$this->fontttf;
+        $fontttf = $ttfPath.$this->font_ttf;
 
-        if ($this->useNoise) {
+        if ($this->use_noise) {
             // 绘杂点
             $this->writeNoise();
         }
-        if ($this->useCurve) {
+        if ($this->use_curve) {
             // 绘干扰线
             $this->writeCurve();
         }
 
         // 绘验证码
         foreach (str_split($text) as $index => $char) {
-            $x = $this->fontSize * ($index + 1);
-            $y = $this->fontSize + mt_rand(10, 20);
+            $x = $this->font_size * ($index + 1);
+            $y = $this->font_size + mt_rand(10, 20);
             $angle = $this->math ? 0 : mt_rand(-40, 40);
 
-            @imagettftext($this->im, $this->fontSize, $angle, (int) $x, (int) $y, (int) $this->color, $fontttf, $char);
+            @imagettftext($this->img, $this->font_size, $angle, (int) $x, (int) $y, (int) $this->color, $fontttf, $char);
         }
 
         ob_start();
         // 输出图像
-        @imagejpeg($this->im, null, (int) $this->quality);
+        @imagejpeg($this->img, null, (int) $this->quality);
         $content = ob_get_clean();
-        @imagedestroy($this->im);
+        @imagedestroy($this->img);
 
         return $content;
     }
@@ -193,14 +196,14 @@ class CaptchaService implements CaptchaInterface
         $codeSet = '2345678abcdefhijkmnpqrstuvwxyz';
         for ($i = 0; $i < 10; ++$i) {
             // 杂点颜色
-            $noiseColor = @imagecolorallocate($this->im, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
+            $noiseColor = @imagecolorallocate($this->img, mt_rand(150, 225), mt_rand(150, 225), mt_rand(150, 225));
             for ($j = 0; $j < 5; ++$j) {
                 // 绘杂点
                 @imagestring(
-                    $this->im,
+                    $this->img,
                     5,
-                    mt_rand(-10, $this->imageW),
-                    mt_rand(-10, $this->imageH),
+                    mt_rand(-10, $this->img_width),
+                    mt_rand(-10, $this->img_height),
                     $codeSet[mt_rand(0, 29)],
                     (int) $noiseColor
                 );
@@ -223,22 +226,22 @@ class CaptchaService implements CaptchaInterface
         $py = 0;
 
         // 曲线前部分
-        $A = mt_rand(1, (int) ($this->imageH / 2)); // 振幅
-        $b = mt_rand((int) (-$this->imageH / 4), (int) ($this->imageH / 4)); // Y轴方向偏移量
-        $f = mt_rand((int) (-$this->imageH / 4), (int) ($this->imageH / 4)); // X轴方向偏移量
-        $T = mt_rand($this->imageH, $this->imageW * 2); // 周期
+        $A = mt_rand(1, (int) ($this->img_height / 2)); // 振幅
+        $b = mt_rand((int) (-$this->img_height / 4), (int) ($this->img_height / 4)); // Y轴方向偏移量
+        $f = mt_rand((int) (-$this->img_height / 4), (int) ($this->img_height / 4)); // X轴方向偏移量
+        $T = mt_rand($this->img_height, $this->img_width * 2); // 周期
         $w = (2 * M_PI) / $T;
 
         $px1 = 0; // 曲线横坐标起始位置
-        $px2 = mt_rand((int) ($this->imageW / 2), (int) ($this->imageW * 0.8)); // 曲线横坐标结束位置
+        $px2 = mt_rand((int) ($this->img_width / 2), (int) ($this->img_width * 0.8)); // 曲线横坐标结束位置
 
         for ($px = $px1; $px <= $px2; $px = $px + 1) {
             if ($w != 0) {
-                $py = $A * sin($w * $px + $f) + $b + $this->imageH / 2; // y = Asin(ωx+φ) + b
-                $i = (int) ($this->fontSize / 5);
+                $py = $A * sin($w * $px + $f) + $b + $this->img_height / 2; // y = Asin(ωx+φ) + b
+                $i = (int) ($this->font_size / 5);
                 while ($i > 0) {
                     @imagesetpixel(
-                        $this->im,
+                        $this->img,
                         (int) ($px + $i),
                         (int) ($py + $i),
                         (int) $this->color
@@ -249,20 +252,20 @@ class CaptchaService implements CaptchaInterface
         }
 
         // 曲线后部分
-        $A = mt_rand(1, (int) ($this->imageH / 2)); // 振幅
-        $f = mt_rand((int) (-$this->imageH / 4), (int) ($this->imageH / 4)); // X轴方向偏移量
-        $T = mt_rand($this->imageH, $this->imageW * 2); // 周期
+        $A = mt_rand(1, (int) ($this->img_height / 2)); // 振幅
+        $f = mt_rand((int) (-$this->img_height / 4), (int) ($this->img_height / 4)); // X轴方向偏移量
+        $T = mt_rand($this->img_height, $this->img_width * 2); // 周期
         $w = (2 * M_PI) / $T;
-        $b = $py - $A * sin($w * $px + $f) - $this->imageH / 2;
+        $b = $py - $A * sin($w * $px + $f) - $this->img_height / 2;
         $px1 = $px2;
-        $px2 = $this->imageW;
+        $px2 = $this->img_width;
 
         for ($px = $px1; $px <= $px2; $px = $px + 1) {
             if ($w != 0) {
-                $py = $A * sin($w * $px + $f) + $b + $this->imageH / 2; // y = Asin(ωx+φ) + b
-                $i = (int) ($this->fontSize / 5);
+                $py = $A * sin($w * $px + $f) + $b + $this->img_height / 2; // y = Asin(ωx+φ) + b
+                $i = (int) ($this->font_size / 5);
                 while ($i > 0) {
-                    @imagesetpixel($this->im, (int) ($px + $i), (int) ($py + $i), (int) $this->color);
+                    @imagesetpixel($this->img, (int) ($px + $i), (int) ($py + $i), (int) $this->color);
                     --$i;
                 }
             }
