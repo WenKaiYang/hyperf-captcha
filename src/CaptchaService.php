@@ -53,7 +53,7 @@ class CaptchaService implements CaptchaInterface
     protected int $length = 5;
 
     // 验证码字体，不设置随机获取
-    protected string $fontttf = '1.otf';
+    protected string $fontttf = '';
 
     // 背景颜色
     protected array $bg = [243, 251, 254];
@@ -98,29 +98,9 @@ class CaptchaService implements CaptchaInterface
         // 加密 验证码
         $hash = password_hash(mb_strtolower($code, 'UTF-8'), PASSWORD_BCRYPT);
         // 保存 验证码
-        $this->cache->set($this->cache_key . $key, $hash, $this->expired);
+        $this->cache->set($this->cache_key.$key, $hash, $this->expired);
 
-        return 'data:image/jpeg;base64,' . base64_encode($this->createImage($text));
-    }
-
-    /**
-     * 验证图片验证码
-     * @throws InvalidArgumentException
-     */
-    public function verify(string $code, string $key): bool
-    {
-        // 是否 启用验证
-        if (! $this->config->get('captcha.enable', true)) {
-            return true;
-        }
-        // 读取
-        $hash = $this->cache->get($this->cache_key . $key, null);
-        // 比较 验证码
-        $bool = $hash && password_verify(mb_strtolower($code, 'UTF-8'), $hash);
-        // 删除 验证码
-        $bool && $this->cache->delete($this->cache_key . $key);
-
-        return $bool;
+        return 'data:image/jpeg;base64,'.base64_encode($this->createImage($text));
     }
 
     /**
@@ -170,7 +150,7 @@ class CaptchaService implements CaptchaInterface
         // 验证码字体随机颜色
         $this->color = @imagecolorallocate($this->im, mt_rand(1, 150), mt_rand(1, 150), mt_rand(1, 150));
         // 验证码使用随机字体
-        $ttfPath = __DIR__ . '/assets/' . ($this->useZh ? 'zhttfs' : 'ttfs') . '/';
+        $ttfPath = __DIR__.'/assets/'.($this->useZh ? 'zhttfs' : 'ttfs').'/';
 
         if (empty($this->fontttf)) {
             $dir = dir($ttfPath);
@@ -184,7 +164,7 @@ class CaptchaService implements CaptchaInterface
             $this->fontttf = $ttfs[array_rand($ttfs)];
         }
         // 字体
-        $fontttf = $ttfPath . $this->fontttf;
+        $fontttf = $ttfPath.$this->fontttf;
 
         if ($this->useImgBg) {
             // 绘北京
@@ -205,12 +185,12 @@ class CaptchaService implements CaptchaInterface
             $y = $this->fontSize + mt_rand(10, 20);
             $angle = $this->math ? 0 : mt_rand(-40, 40);
 
-            @imagettftext($this->im, $this->fontSize, $angle, (int) $x, (int) $y, $this->color, $fontttf, $char);
+            @imagettftext($this->im, $this->fontSize, $angle, (int) $x, (int) $y, (int)$this->color, $fontttf, $char);
         }
 
         ob_start();
         // 输出图像
-        @imagejpeg($this->im, null, $this->quality);
+        @imagejpeg($this->im, null,(int) $this->quality);
         $content = ob_get_clean();
         @imagedestroy($this->im);
 
@@ -223,13 +203,13 @@ class CaptchaService implements CaptchaInterface
      */
     protected function background(): void
     {
-        $path = __DIR__ . '/assets/bgs/';
+        $path = __DIR__.'/assets/bgs/';
         $dir = dir($path);
 
         $bgs = [];
         while (false !== ($file = $dir->read())) {
             if ($file[0] != '.' && str_ends_with($file, '.jpg')) {
-                $bgs[] = $path . $file;
+                $bgs[] = $path.$file;
             }
         }
         $dir->close();
@@ -239,7 +219,12 @@ class CaptchaService implements CaptchaInterface
         [$width, $height] = @getimagesize($gb);
         // Resample
         $bgImage = @imagecreatefromjpeg($gb);
-        @imagecopyresampled($this->im, $bgImage, 0, 0, 0, 0, $this->imageW, $this->imageH, $width, $height);
+        @imagecopyresampled(
+            $this->im, $bgImage,
+            0, 0, 0, 0,
+            (int) $this->imageW, (int) $this->imageH,
+            (int) $width, (int) $height
+        );
         @imagedestroy($bgImage);
     }
 
@@ -261,7 +246,7 @@ class CaptchaService implements CaptchaInterface
                     mt_rand(-10, $this->imageW),
                     mt_rand(-10, $this->imageH),
                     $codeSet[mt_rand(0, 29)],
-                    $noiseColor
+                    (int) $noiseColor
                 );
             }
         }
@@ -300,7 +285,7 @@ class CaptchaService implements CaptchaInterface
                         $this->im,
                         (int) ($px + $i),
                         (int) ($py + $i),
-                        $this->color
+                        (int) $this->color
                     ); // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多
                     --$i;
                 }
@@ -321,10 +306,30 @@ class CaptchaService implements CaptchaInterface
                 $py = $A * sin($w * $px + $f) + $b + $this->imageH / 2; // y = Asin(ωx+φ) + b
                 $i = (int) ($this->fontSize / 5);
                 while ($i > 0) {
-                    @imagesetpixel($this->im, (int) ($px + $i), (int) ($py + $i), $this->color);
+                    @imagesetpixel($this->im, (int) ($px + $i), (int) ($py + $i), (int) $this->color);
                     --$i;
                 }
             }
         }
+    }
+
+    /**
+     * 验证图片验证码
+     * @throws InvalidArgumentException
+     */
+    public function verify(string $code, string $key): bool
+    {
+        // 是否 启用验证
+        if (!$this->config->get('captcha.enable', true)) {
+            return true;
+        }
+        // 读取
+        $hash = $this->cache->get($this->cache_key.$key, null);
+        // 比较 验证码
+        $bool = $hash && password_verify(mb_strtolower($code, 'UTF-8'), $hash);
+        // 删除 验证码
+        $bool && $this->cache->delete($this->cache_key.$key);
+
+        return $bool;
     }
 }
