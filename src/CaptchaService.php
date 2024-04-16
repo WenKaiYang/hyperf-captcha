@@ -53,7 +53,7 @@ class CaptchaService implements CaptchaInterface
     protected int $length = 5;
 
     // 验证码字体，不设置随机获取
-    protected string $fontttf = '';
+    protected string $fontttf = '1.otf';
 
     // 背景颜色
     protected array $bg = [243, 251, 254];
@@ -223,7 +223,7 @@ class CaptchaService implements CaptchaInterface
      */
     protected function background(): void
     {
-        $path = __DIR__ . '/captcha/assets/bgs/';
+        $path = __DIR__ . '/assets/bgs/';
         $dir = dir($path);
 
         $bgs = [];
