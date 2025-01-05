@@ -32,5 +32,5 @@ function captcha_create(?string $key = null): array
  */
 function captcha_verify(string $code, string $key): bool
 {
-    return make(CaptchaInterface::class)->verify($key, $code);
+    return make(CaptchaInterface::class)->verify(code: $code, key: $key);
 }
